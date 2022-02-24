@@ -1,69 +1,60 @@
 #include <iostream>
-#include <string.h>
+#include <math.h>
 using namespace std;
-class fig{
+class Numar_Complex{
+    double re,im;
 public:
-    int figura=0,baza[1][2]={},inaltime=0,aria=0;
-    void cit (){
-        cout<<"1-cerc 2-dreptunghi 3-patrat 4-triunghi dreptunghic\n";
-        cout<<"Figura:";
-        cin>>figura;
-        if(figura==1) {
-            cout<<"Raza:";
-            cin >> baza[0][0]; //raza
-            aria=baza[0][0]*baza[0][0]*3; //aproximam pi la 3
-        }
-        if(figura==2) {
-            cout<<"Lungimea si latimea:";
-            cin >> baza[0][0] >> baza[0][1]; //lungime si latime
-            aria=baza[0][0]*baza[0][1];
-        }
-        if(figura==3) {
-            cout<<"Latura:";
-            cin >> baza[0][0]; //latura
-            aria=baza[0][0]*baza[0][0];
-        }
-        if(figura==4) {
-            cout<<"Cateta 1 si 2:";
-            cin >> baza[0][0] >> baza[0][1]; // cateta 1 si cateta 2
-            aria=baza[0][0]*baza[0][1]/2;
-        }
-        cout<<"Inaltimea:";
-        cin>>inaltime;
+    Numar_Complex(double re_,double im_){
+        re=re_;
+        im=im_;
+    }
+    Numar_Complex(const Numar_Complex &nr){
+        re=nr.re;
+        im=nr.im;
+    }
+    double getRe() const {
+        return re;
     }
 
-};
-int main() {
-    int gem=0,frisca=0,i=-1,k,j;
-    char comanda[100],*p;
-    fig shapes[101];
-    gets(comanda);
-    while(strcmp(comanda,"STOP")){
-        if(strcmp(comanda,"TOTAL")==0){
-            cout<<"frisca: "<<frisca<<"\ngem: "<<gem<<'\n';
-        }
-        else
-        if(strcmp(comanda,"ADD")==0){
-            shapes[++i].cit();
-            cout<<"Cantitatile necesare de frisca:"<<shapes[i].aria<<" si gem:"<<shapes[i].aria*shapes[i].inaltime*2;
-            gem+=shapes[i].aria*shapes[i].inaltime*2;
-            frisca+=shapes[i].aria;
-        }
-        else{
-            p= strtok(comanda," ");
-            if(strcmp(comanda,"REMOVE")==0) {
-                p = strtok(NULL, " ");
-                k = atoi(p);
-                gem -= shapes[k - 1].aria * shapes[k - 1].inaltime * 2;
-                frisca -= shapes[k - 1].aria;
-                for (j = k - 1; j <= i; ++j)
-                    shapes[j] = shapes[j + 1];
-                i--;
-            }
-        }
-        cout<<'\n';
-        fflush(stdin);
-        gets(comanda);
+    void setRe(double re) {
+        Numar_Complex::re = re;
     }
+
+    double getIm() const {
+        return im;
+    }
+
+    void setIm(double im) {
+        Numar_Complex::im = im;
+    }
+
+    void afisare() {
+        if(re!=0)
+            cout<<re;
+        if(im<0)
+            cout<<im<<"i";
+        else
+            if(im>0)
+                cout<<"+"<<im<<"i";
+    }
+    double modul(){
+        return sqrt(im*im+re*re);
+    }
+
+    Numar_Complex operator+(const Numar_Complex &rhs) const {
+        return Numar_Complex(re+rhs.re,im+rhs.im);
+    }
+    Numar_Complex operator*(const Numar_Complex &rhs) const {
+        return Numar_Complex(re*rhs.re-im*rhs.im,re*rhs.im+im*rhs.re);
+    }
+    Numar_Complex operator/(const Numar_Complex &rhs) const {
+        return Numar_Complex((re*rhs.re+im*rhs.im)/(rhs.re*rhs.re+rhs.im*rhs.im),(rhs.re*im-re*rhs.im)/(rhs.re*rhs.re+rhs.im*rhs.im));
+    }
+};
+int main(){
+    Numar_Complex z(3,4);
+    Numar_Complex x(1,2);
+    Numar_Complex h=z/x;
+    h.afisare();
     return 0;
 }
