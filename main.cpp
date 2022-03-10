@@ -31,7 +31,7 @@ public:
         coeficienti=new double[grad_polinom+1];
     }
 
-    void getCoeficienti(double coef[]){
+    void getCoeficienti(double coef[])const{
         for(int i=0;i<=grad_polinom;++i)
             coef[i]=coeficienti[i];
     }
@@ -57,7 +57,7 @@ public:
         cout<<'\n';
         return is;
     }
-    double valoarePunct(const double &x){
+    double valoarePunct(const double &x)const{
         double sum=0;
         double pct=1;
         for(int i=0;i<=grad_polinom;++i) {
@@ -129,7 +129,7 @@ public:
             cin>> *(this+i);
         }
     }
-    void afisaren(const int &n){
+    void afisaren(const int &n) const{
         for(int i=0;i<n;i++){
             cout<< i << ")" << *(this+i)<<'\n';
         }
