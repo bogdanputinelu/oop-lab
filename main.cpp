@@ -46,29 +46,29 @@ public:
         return *this;
     }
 
-    const string &getNumeAbonament() const{
-        return nume_abonament;
-    }
+//    const string &getNumeAbonament() const{
+//        return nume_abonament;
+//    }
 
-    void setNumeAbonament(const string &numeAbonament) {
-        nume_abonament = numeAbonament;
-    }
+//    void setNumeAbonament(const string &numeAbonament) {
+//        nume_abonament = numeAbonament;
+//    }
 
     float getPret() const {
         return pret;
     }
 
-    void setPret(float pret_) {
-        pret = pret_;
-    }
+//    void setPret(float pret_) {
+//        pret = pret_;
+//    }
 
     int getPerioada() const {
         return perioada;
     }
 
-    void setPerioada(int perioada_) {
-        perioada = perioada_;
-    }
+//    void setPerioada(int perioada_) {
+//        perioada = perioada_;
+//    }
     virtual TipAbonament getType() const{
         return TipAbonament::Abonament;
     }
@@ -138,9 +138,9 @@ public:
         return reducere;
     }
 
-    void setReducere(int reducere_) {
-        reducere = reducere_;
-    }
+//    void setReducere(int reducere_) {
+//        reducere = reducere_;
+//    }
 };
 class Persoana{
 protected:
@@ -159,29 +159,29 @@ public:
         return *this;
     }
 
-    int getId() const {
-        return id;
-    }
+//    int getId() const {
+//        return id;
+//    }
 
-    void setId(int id_) {
-        id = id_;
-    }
+//    void setId(int id_) {
+//        id = id_;
+//    }
 
-    const string &getNume() const {
-        return nume;
-    }
+//    const string &getNume() const {
+//        return nume;
+//    }
 
-    void setNume(const string &nume_) {
-        nume = nume_;
-    }
+//    void setNume(const string &nume_) {
+//        nume = nume_;
+//    }
 
-    const string &getCnp() const {
-        return cnp;
-    }
+//    const string &getCnp() const {
+//        return cnp;
+//    }
 
-    void setCnp(const string &cnp_) {
-        cnp = cnp_;
-    }
+//    void setCnp(const string &cnp_) {
+//        cnp = cnp_;
+//    }
     virtual void print(ostream &os) const{
         os << "Id: " << id<<'\n';
         os<< "Nume: " << nume<<'\n';
@@ -219,13 +219,13 @@ public:
         return *this;
     }
 
-    const string &getNrTelefon() const {
-        return nr_telefon;
-    }
+//    const string &getNrTelefon() const {
+//        return nr_telefon;
+//    }
 
-    void setNrTelefon(const string &nrTelefon) {
-        nr_telefon = nrTelefon;
-    }
+//    void setNrTelefon(const string &nrTelefon) {
+//        nr_telefon = nrTelefon;
+//    }
     void print(ostream &os) const override{
         Persoana::print(os);
         cout<<"Nr telefon: "<<nr_telefon<<'\n';
@@ -262,9 +262,9 @@ public:
         return x;
     }
 
-    void setX(const shared_ptr<Abonament> &x) {
-        Abonat::x = x;
-    }
+//    void setX(const shared_ptr<Abonament> &x) {
+//        Abonat::x = x;
+//    }
 };
 class Clienti{
     static vector<shared_ptr<Abonat>> abonati;
