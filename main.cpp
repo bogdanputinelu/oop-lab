@@ -402,11 +402,11 @@ int main() {
             if(meniu==2){
                 int n,cont;
                 Abonat abonat;
-                bool ok,stop=true;
+                bool stop=true;
                 cout<<"Adaugati numarul clientilor ce vor fi introdusi:";
                 cin>>n;
                 for(int i=0;i<n && stop;++i){
-                    ok=true;
+                    bool ok=true;
                     while(ok) {
                         try {
                             cin >> abonat;
