@@ -344,7 +344,7 @@ public:
 };
 vector<shared_ptr<Abonat>> Clienti::abonati;
 int main() {
-    int meniu;
+    int meniu=0;
     char c[100];
     while(true){
         cout<<"\nClasa Clienti : Pentru a alege o optiune introduceti numarul comenzii:\n\n";
