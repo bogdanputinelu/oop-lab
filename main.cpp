@@ -479,8 +479,7 @@ int main() {
                                         cin>>c;
                                     }
                                     else
-                                        if(meniu==9)
-                                            break;
+                                        break;
     }
     return 0;
 }
