@@ -34,8 +34,8 @@ protected:
     float pret;
     int perioada;
 public:
-    Abonament(const string &nume_abonament="",const float &pret=0,const int &perioada=0):nume_abonament(move(nume_abonament)), pret(pret),perioada(perioada){}
-    Abonament(const Abonament &abon): nume_abonament(move(abon.nume_abonament)), pret(abon.pret), perioada(abon.perioada){}
+    Abonament(const string &nume_abonament="",const float &pret=0,const int &perioada=0):nume_abonament(nume_abonament), pret(pret),perioada(perioada){}
+    Abonament(const Abonament &abon): nume_abonament(abon.nume_abonament), pret(abon.pret), perioada(abon.perioada){}
     virtual ~Abonament() = default;
     Abonament& operator=(const Abonament &rhs){
         if(this==&rhs)
@@ -101,7 +101,7 @@ public:
 class Abonament_Premium: public Abonament{
     int reducere;
 public:
-    Abonament_Premium(const string &nume="",const float &pr=0,const int &per=0,const int &red=0): Abonament(move(nume),pr,per),reducere(red){}
+    Abonament_Premium(const string &nume="",const float &pr=0,const int &per=0,const int &red=0): Abonament(nume,pr,per),reducere(red){}
     Abonament_Premium(const Abonament_Premium &prem): Abonament(prem), reducere(prem.reducere){}
     Abonament_Premium& operator=(const Abonament_Premium &rhs){
         if(this==&rhs)
@@ -147,8 +147,8 @@ protected:
     int id;
     string nume,cnp;
 public:
-    Persoana(const int &Id=0,const string &Nume="",const string &CNP=""):id(Id),nume(move(Nume)),cnp(CNP){}
-    Persoana(const Persoana &pers):id(pers.id),nume(move(pers.nume)),cnp(pers.cnp){}
+    Persoana(const int &Id=0,const string &Nume="",const string &CNP=""):id(Id),nume(Nume),cnp(CNP){}
+    Persoana(const Persoana &pers):id(pers.id),nume(pers.nume),cnp(pers.cnp){}
     virtual ~Persoana() = default;
     Persoana& operator=(const Persoana &rhs){
         if(this==&rhs)
@@ -208,8 +208,8 @@ class Abonat: public Persoana{
     string nr_telefon;
     shared_ptr<Abonament> x;
 public:
-    Abonat(const int &Id=0,const string &Nume="",const string &CNP="",const string &nrtel="",const shared_ptr<Abonament> y = nullptr):Persoana(Id,move(Nume),move(CNP)), nr_telefon(move(nrtel)),x(y){}
-    Abonat(const Abonat &ab): Persoana(ab),nr_telefon(move(ab.nr_telefon)),x(ab.x){}
+    Abonat(const int &Id=0,const string &Nume="",const string &CNP="",const string &nrtel="",const shared_ptr<Abonament> y = nullptr):Persoana(Id,Nume,CNP), nr_telefon(nrtel),x(y){}
+    Abonat(const Abonat &ab): Persoana(ab),nr_telefon(ab.nr_telefon),x(ab.x){}
     Abonat& operator=(const Abonat &rhs){
         if(this==&rhs)
             return *this;
