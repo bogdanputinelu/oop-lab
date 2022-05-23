@@ -322,6 +322,7 @@ public:
             }
         }
         vandute.push_back(car);
+        return *this;
     }
 
 };
@@ -406,6 +407,7 @@ public:
             car->setVara(true);
         }
         vandute.push_back(car);
+        return *this;
     }
 
 };
