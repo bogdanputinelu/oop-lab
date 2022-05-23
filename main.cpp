@@ -1,485 +1,573 @@
 #include <iostream>
-#include <string>
-#include <memory>
 #include <vector>
+#include <memory>
+#include <algorithm>
+
 using namespace std;
-class InvalidPret: public exception{
+enum class TipMasina{
+    Mini,
+    Compact,
+    Monovolume
+};
+class InvalidPersoane:public exception{
 public:
-    InvalidPret() = default;
+    InvalidPersoane()=default;
     const char* what() const noexcept override{
-        return "Pretul este invalid.";
+        return "Numar de persoane invalid.";
     }
 };
-class InvalidPerioada: public exception{
+
+class InvalidAutomobil:public exception{
 public:
-    InvalidPerioada() = default;
+    InvalidAutomobil()=default;
     const char* what() const noexcept override{
-        return "Perioada este invalida.";
+        return "Automobil invalid.";
     }
 };
-class InvalidReducere: public exception{
+class AlreadyCreated:public exception{
 public:
-    InvalidReducere() = default;
+    AlreadyCreated()=default;
     const char* what() const noexcept override{
-        return "Reducerea este invalida.";
+        return "Creat deja";
     }
 };
-enum class TipAbonament {
-    Abonament,
-    Abonament_Premium
-};
-class Abonament{
+
+class Automobil{
 protected:
-    string nume_abonament;
-    float pret;
-    int perioada;
+    int pret;
 public:
-    Abonament(const string &nume_abonament="",const float &pret=0,const int &perioada=0):nume_abonament(nume_abonament), pret(pret),perioada(perioada){}
-    Abonament(const Abonament &abon): nume_abonament(abon.nume_abonament), pret(abon.pret), perioada(abon.perioada){}
-    virtual ~Abonament() = default;
-    Abonament& operator=(const Abonament &rhs){
-        if(this==&rhs)
-            return *this;
-        nume_abonament=rhs.nume_abonament;
-        pret=rhs.pret;
-        perioada=rhs.perioada;
+    Automobil(const int& pr=0):pret(pr){}
+    virtual ~Automobil()=default;
+    Automobil(const Automobil& aut):pret(aut.pret){}
+    Automobil& operator=(const Automobil& aut);
+    friend istream& operator>>(istream& is,Automobil& a);
+    virtual void scan(istream& is);
+    friend ostream& operator<<(ostream& os,const Automobil& a);
+    virtual void print(ostream& os) const;
+    virtual TipMasina getType()const=0;
+
+    int getPret() const;
+};
+Automobil& Automobil::operator=(const Automobil &aut) {
+    if(this==&aut)
         return *this;
-    }
+    pret=aut.pret;
+    return *this;
+}
+istream& operator>>(istream& is,Automobil& a){
+    a.scan(is);
+    return is;
+}
+void Automobil::scan(istream &is) {
+    cout<<"Pret:";
+    is>>pret;
+}
+ostream& operator<<(ostream& os,const Automobil& a){
+    a.print(os);
+    return os;
+}
+void Automobil::print(ostream &os) const{
+    os<<"Pret: "<<pret<<'\n';
+}
 
-//    const string &getNumeAbonament() const{
-//        return nume_abonament;
-//    }
+int Automobil::getPret() const {
+    return pret;
+}
 
-//    void setNumeAbonament(const string &numeAbonament) {
-//        nume_abonament = numeAbonament;
-//    }
-
-    float getPret() const {
-        return pret;
-    }
-
-//    void setPret(float pret_) {
-//        pret = pret_;
-//    }
-
-    int getPerioada() const {
-        return perioada;
-    }
-
-//    void setPerioada(int perioada_) {
-//        perioada = perioada_;
-//    }
-    virtual TipAbonament getType() const{
-        return TipAbonament::Abonament;
-    }
-    virtual void print(ostream &os) const{
-        os<<"Nume abonament: "<<nume_abonament<<'\n';
-        os<<"Pret: "<<pret<<'\n';
-        os<<"Perioada (nr de luni): "<<perioada<<'\n';
-    }
-    friend ostream &operator<<(ostream &os, const Abonament &abonament) {
-        abonament.print(os);
-        return os;
-    }
-    virtual void scan(istream &is){
-        cout<<"Nume abonament:";
-        getline(is>>ws,nume_abonament);
-        cout<<"Pret:";
-        is>>pret;
-        if(pret<0)
-            throw InvalidPret();
-        cout<<"Perioada (nr de luni):";
-        is>>perioada;
-        if(perioada<0)
-            throw InvalidPerioada();
-    }
-    friend istream &operator>>(istream &is,Abonament &abonament) {
-        abonament.scan(is);
-        return is;
-    }
-};
-class Abonament_Premium: public Abonament{
-    int reducere;
+class Mini:public Automobil{
+    int litraj,lung;
 public:
-    Abonament_Premium(const string &nume="",const float &pr=0,const int &per=0,const int &red=0): Abonament(nume,pr,per),reducere(red){}
-    Abonament_Premium(const Abonament_Premium &prem): Abonament(prem), reducere(prem.reducere){}
-    Abonament_Premium& operator=(const Abonament_Premium &rhs){
-        if(this==&rhs)
-            return *this;
-        Abonament::operator=(rhs);
-        reducere=rhs.reducere;
+    Mini(const int& pr=0,const int& lit=0, const int& l=0):Automobil(pr),litraj(lit),lung(l){}
+    Mini(const Mini& m): Automobil(m),litraj(m.litraj),lung(m.lung){}
+    Mini& operator=(const Mini& mini);
+    void scan(istream& is) override;
+    void print(ostream& os) const override;
+    TipMasina getType()const override{
+        return TipMasina::Mini;
+    }
+
+    int getLitraj() const;
+
+    int getLung() const;
+
+};
+Mini& Mini::operator=(const Mini& mini){
+    Automobil::operator=(mini);
+    if(this==&mini)
         return *this;
-    }
-    void print(ostream &os) const override{
-        Abonament::print(os);
-        os<<"Reducere (%): "<<reducere<<'\n';
-    }
+    litraj=mini.litraj;
+    lung=mini.lung;
+    return *this;
+}
+void Mini::scan(istream &is) {
+    Automobil::scan(is);
+    cout<<"Litraj:";
+    is>>litraj;
+    cout<<"Lungime:";
+    is>>lung;
+}
+void Mini::print(ostream &os) const {
+    Automobil::print(os);
+    cout<<"Litraj: "<<litraj<<'\n'<<"Lungime: "<<lung<<'\n';
+}
 
-    friend ostream &operator<<(ostream &os, const Abonament_Premium &premium) {
-        premium.print(os);
-        return os;
-    }
-    TipAbonament getType() const override{
-        return TipAbonament::Abonament_Premium;
-    }
-    void scan(istream &is) override{
-        Abonament::scan(is);
-        cout<<"Reducere (%):";
-        is>>reducere;
-        if(reducere<0 || reducere>100)
-            throw InvalidReducere();
-    }
-    friend istream &operator>>(istream &is, Abonament_Premium &premium) {
-        premium.scan(is);
-        return is;
-    }
+int Mini::getLitraj() const {
+    return litraj;
+}
 
-    int getReducere() const {
-        return reducere;
-    }
+int Mini::getLung() const {
+    return lung;
+}
 
-//    void setReducere(int reducere_) {
-//        reducere = reducere_;
-//    }
-};
-class Persoana{
-protected:
-    int id;
-    string nume,cnp;
+class Compact:public Automobil{
+    int dimensiune;
 public:
-    Persoana(const int &Id=0,const string &Nume="",const string &CNP=""):id(Id),nume(Nume),cnp(CNP){}
-    Persoana(const Persoana &pers):id(pers.id),nume(pers.nume),cnp(pers.cnp){}
-    virtual ~Persoana() = default;
-    Persoana& operator=(const Persoana &rhs){
-        if(this==&rhs)
-            return *this;
-        id=rhs.id;
-        nume=rhs.nume;
-        cnp=rhs.cnp;
+    Compact(const int& pr=0,const int& d=0): Automobil(pr),dimensiune(d){}
+    Compact(const Compact& com): Automobil(com),dimensiune(com.dimensiune){}
+    Compact& operator=(const Compact& com);
+    void scan(istream& is)override;
+    void print(ostream& os) const override;
+    TipMasina getType()const override{
+        return TipMasina::Compact;
+    }
+
+    int getDimensiune() const;
+};
+Compact& Compact::operator=(const Compact& com){
+    Automobil::operator=(com);
+    if(this==&com)
         return *this;
-    }
+    dimensiune=com.dimensiune;
+    return *this;
+}
+void Compact::scan(istream &is) {
+    Automobil::scan(is);
+    cout<<"Dimensiune:";
+    is>>dimensiune;
+}
+void Compact::print(ostream &os) const {
+    Automobil::print(os);
+    cout<<"Dimensiune: "<<dimensiune<<'\n';
+}
 
-//    int getId() const {
-//        return id;
-//    }
+int Compact::getDimensiune() const {
+    return dimensiune;
+}
 
-//    void setId(int id_) {
-//        id = id_;
-//    }
-
-//    const string &getNume() const {
-//        return nume;
-//    }
-
-//    void setNume(const string &nume_) {
-//        nume = nume_;
-//    }
-
-//    const string &getCnp() const {
-//        return cnp;
-//    }
-
-//    void setCnp(const string &cnp_) {
-//        cnp = cnp_;
-//    }
-    virtual void print(ostream &os) const{
-        os << "Id: " << id<<'\n';
-        os<< "Nume: " << nume<<'\n';
-        os<< "CNP: " << cnp<<'\n';
-    }
-    friend ostream &operator<<(ostream &os, const Persoana &persoana) {
-        persoana.print(os);
-        return os;
-    }
-    virtual void scan(istream &is){
-        cout << "Id:";
-        is>> id;
-        cout<< "Nume:";
-        getline(is >> ws,nume);
-        cout<< "CNP:";
-        is>> cnp;
-    }
-    friend istream &operator>>(istream &is, Persoana &persoana) {
-        persoana.scan(is);
-        return is;
-    }
-};
-class Abonat: public Persoana{
-    string nr_telefon;
-    shared_ptr<Abonament> x;
+class Monovolume:public Automobil{
+    int pers,ani;
+    bool sh,vara;
+    const int discount=10;
 public:
-    Abonat(const int &Id=0,const string &Nume="",const string &CNP="",const string &nrtel="",const shared_ptr<Abonament> y = nullptr):Persoana(Id,Nume,CNP), nr_telefon(nrtel),x(y){}
-    Abonat(const Abonat &ab): Persoana(ab),nr_telefon(ab.nr_telefon),x(ab.x){}
-    Abonat& operator=(const Abonat &rhs){
-        if(this==&rhs)
-            return *this;
-        Persoana::operator=(rhs);
-        nr_telefon=rhs.nr_telefon;
-        x=rhs.x;
+    Monovolume(const int& pr=0,const int&p=0,const bool& s=false, const int& a=0): Automobil(pr),pers(p),sh(s),ani(a),vara(false){}
+    Monovolume(const Monovolume& mono): Automobil(mono),pers(mono.pers),sh(mono.sh),ani(mono.ani),vara(mono.vara){}
+    Monovolume& operator=(const Monovolume& mono);
+    void scan(istream& is) override;
+    void print(ostream& os) const override;
+    TipMasina getType()const override{
+        return TipMasina::Monovolume;
+    }
+
+    void setVara(const bool& v){
+        vara=v;
+    }
+
+    bool getVara() const{
+        return vara;
+    }
+
+    int getPers() const;
+
+    int getAni() const;
+
+    bool isSh() const;
+};
+Monovolume& Monovolume::operator=(const Monovolume& mono){
+    Automobil::operator=(mono);
+    if(this==&mono)
         return *this;
+    pers=mono.pers;
+    sh=mono.sh;
+    ani=mono.ani;
+    vara=mono.vara;
+    return *this;
+}
+void Monovolume::scan(istream &is) {
+    Automobil::scan(is);
+    vara= false;
+    cout<<"Persoane:";
+    is>>pers;
+    if(pers<5 || pers>7)
+        throw InvalidPersoane();
+    cout<<"Introduceti 1 daca masina este second hand, altfel 0:";
+    is>>sh;
+    ani=0;
+    if(sh) {
+        cout << "Ani vechime:";
+        is >> ani;
     }
-
-//    const string &getNrTelefon() const {
-//        return nr_telefon;
-//    }
-
-//    void setNrTelefon(const string &nrTelefon) {
-//        nr_telefon = nrTelefon;
-//    }
-    void print(ostream &os) const override{
-        Persoana::print(os);
-        cout<<"Nr telefon: "<<nr_telefon<<'\n';
-        cout<<*x<<'\n';
-    }
-    friend ostream &operator<<(ostream &os, const Abonat &abonat) {
-        abonat.print(os);
-        return os;
-    }
-    void scan(istream &is) override{
-        Persoana::scan(is);
-        int ok;
-        cout<<"Nr telefon:";
-        is>>nr_telefon;
-        cout<<"Alegeti abonamentul (0 pentru abonament normal, 1 pentru abonament premium):";
-        is>>ok;
-        if(ok){
-            Abonament_Premium ab;
-            cin>>ab;
-            x= make_shared<Abonament_Premium>(ab);
-        }
-        else{
-            Abonament abon;
-            cin>>abon;
-            x= make_shared<Abonament>(abon);
+}
+void Monovolume::print(ostream &os) const {
+    Automobil::print(os);
+    cout<<"Persoane: "<<pers<<'\n';
+    if(sh) {
+        os<<"Este second hand cu " << ani<<" ani vechime"<<'\n';
+        os<<"Reducere: "<<ani<<"%\n";
+        if(vara){
+            os<<" + reducere de vara: "<<discount<<"%\n";
         }
     }
-    friend istream &operator>>(istream &is, Abonat &abonat) {
-        abonat.scan(is);
-        return is;
-    }
+}
 
-    const shared_ptr<Abonament> &getX() const {
-        return x;
-    }
+int Monovolume::getPers() const {
+    return pers;
+}
 
-//    void setX(const shared_ptr<Abonament> &x) {
-//        Abonat::x = x;
-//    }
-};
-class Clienti{
-    static vector<shared_ptr<Abonat>> abonati;
-    Clienti() = delete;
+int Monovolume::getAni() const {
+    return ani;
+}
+
+bool Monovolume::isSh() const {
+    return sh;
+}
+
+
+class Factory{
 public:
-    static void addAbonat(const shared_ptr<Abonat> &abonat){
-        abonati.push_back(abonat);
+    static shared_ptr<Automobil> makeAutomobil(const string &automobil,const int& pret=0,const int& litraj=0,const int& lung=0,const bool& sh= false);
+};
+shared_ptr<Automobil> makeAutomobil(const string &automobil,const int& pret=0,const int& litraj=0,const int& lung=0,const bool& sh= false){
+    if(automobil=="mini")
+        return make_shared<Mini>(pret,litraj,lung);
+    if(automobil=="compact")
+        return make_shared<Compact>(pret,litraj);
+    if(automobil=="monovolum")
+        return make_shared<Monovolume>(pret,litraj,sh,lung);
+    throw InvalidAutomobil();
+}
+template<typename T>
+class Vanzare{
+    static bool creat;
+    static int nrStoc,nrVandute;
+    static vector<shared_ptr<T>> stoc;
+    static vector<shared_ptr<T>> vandute;
+public:
+    Vanzare() {
+        if(creat)
+            throw AlreadyCreated();
+        creat= true;
     }
 
-    static vector<shared_ptr<Abonat>> getAbonati() {
-        return abonati;
+    static const vector<shared_ptr<T>> &getStoc();
+
+    static int getNrStoc() {
+        return nrStoc;
     }
-    static void showAbonati(){
-        int i=1;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament) {
-                cout<<"Clientul "<<i<<") Abonament Normal\n";
-            }
-            else{
-                cout<<"Clientul "<<i<<") Abonament Premium\n";
-            }
-            cout<<*abon<<'\n';
-            i++;
-        }
+
+    static int getNrVandute() {
+        return nrVandute;
     }
-    static void showAbonatiNormali(){
-        int i=1;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament) {
-                cout << "Clientul " << i << ") Abonament Normal\n";
-                cout << *abon << '\n';
-                i++;
-            }
-        }
+
+    static void addCar(const shared_ptr<T> &car){
+        stoc.push_back(car);
+        nrStoc++;
     }
-    static void showAbonatiPremium(){
-        int i=1;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament_Premium) {
-                cout << "Clientul " << i << ") Abonament Premium\n";
-                cout << *abon << '\n';
-                i++;
+    static void printCarsStoc(){
+        int i=0;
+        for(auto& car: stoc){
+            ++i;
+            if(car->getType()==TipMasina::Monovolume) {
+                cout<<i << ") Monovolum\n";
+                cout<<*car;
+            }
+            if(car->getType()==TipMasina::Mini) {
+                cout<<i << ") Mini\n";
+                cout<<*car;
+            }
+            if(car->getType()==TipMasina::Compact) {
+                cout<<i << ") Compact\n";
+                cout<<*car;
             }
         }
     }
-    static int getNrAbonatiPremium(){
-        int total=0;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament_Premium) {
-                total++;
+    static void printCarsVandute(){
+        int i=0;
+        for(auto& car: vandute){
+            ++i;
+            if(car->getType()==TipMasina::Monovolume) {
+                cout<<i << ") Monovolum\n";
+                cout<<*car;
+            }
+            if(car->getType()==TipMasina::Mini) {
+                cout<<i << ") Mini\n";
+                cout<<*car;
+            }
+            if(car->getType()==TipMasina::Compact) {
+                cout<<i << ") Compact\n";
+                cout<<*car;
             }
         }
-        return total;
     }
-    static int getNrAbonatiNormali(){
-        int total=0;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament) {
-                total++;
+    Vanzare<T>& operator-=(shared_ptr<T>& car){
+        nrStoc--;
+        nrVandute++;
+        stoc.erase(remove(stoc.begin(),stoc.end(),car),stoc.end());
+        if(car->getType()==TipMasina::Monovolume) {
+            int i;
+            cout << "Este vara? 1 pentru da, 0 pentru nu: ";
+            cin >> i;
+            if (i) {
+                auto mono = dynamic_pointer_cast<Monovolume>(car);
+                mono->setVara(true);
             }
         }
-        return total;
+        vandute.push_back(car);
     }
-    static double sumaIncasata(){
-        double suma=0;
-        for (auto &abon: Clienti::getAbonati()) {
-            if (abon->getX()->getType() == TipAbonament::Abonament_Premium) {
-                auto prem = dynamic_pointer_cast<Abonament_Premium>(abon->getX());
-                suma+=prem->getPerioada()*(prem->getPret()*(double)(100-prem->getReducere())/100);
-            }
-            else{
-                suma+=abon->getX()->getPret()*abon->getX()->getPerioada();
-            }
-        }
-        return suma;
-    }
+
 };
-vector<shared_ptr<Abonat>> Clienti::abonati;
-int main() {
-    int meniu=0;
-    char c[100];
-    while(true){
-        cout<<"\nClasa Clienti : Pentru a alege o optiune introduceti numarul comenzii:\n\n";
-        cout<<"1)Adaugati un client - introduceti 1\n";
-        cout<<"2)Adaugati n clienti - introduceti 2\n";
-        cout<<"3)Afisati toti clientii - introduceti 3\n";
-        cout<<"4)Afisati toti clientii cu abonamente normale - introduceti 4\n";
-        cout<<"5)Afisati toti clientii cu abonamente premium - introduceti 5\n";
-        cout<<"6)Afisati numarul clientilor cu abonamente normale - introduceti 6\n";
-        cout<<"7)Afisati numarul clientilor cu abonamente premium - introduceti 7\n";
-        cout<<"8)Afisati suma incasata de la clienti - introduceti 8\n";
-        cout<<"9)Inchideti programul - introduceti 9\n";
-        cout<<"\nIntroduceti comanda:";
-        cin>>meniu;
-        cout<<'\n';
-        if(meniu==1){
-            cout<<"Adaugati un client:\n";
-            Abonat abonat;
-            bool ok=true;
-            int cont;
-            while(ok) {
+template<typename T>
+vector<shared_ptr<T>> Vanzare<T>::stoc;
+template<typename T>
+vector<shared_ptr<T>> Vanzare<T>::vandute;
+template<typename T>
+int Vanzare<T>::nrStoc=0;
+template<typename T>
+int Vanzare<T>::nrVandute=0;
+template<typename T>
+bool Vanzare<T>::creat=false;
+
+
+template<>
+class Vanzare<Monovolume>{
+    static bool creat;
+    static int nrStoc,nrVandute,nrVanduteVara;
+    static vector<shared_ptr<Monovolume>> stoc;
+    static vector<shared_ptr<Monovolume>> vandute;
+public:
+    Vanzare() {
+        if(creat)
+            throw AlreadyCreated();
+        creat= true;
+    }
+
+    static const vector<shared_ptr<Monovolume>> &getStoc();
+
+    static int getNrStoc() {
+        return nrStoc;
+    }
+
+    static int getNrVandute() {
+        return nrVandute;
+    }
+
+    static int getNrVanduteVara() {
+        return nrVanduteVara;
+    }
+
+    static void addCar(const shared_ptr<Monovolume> &car){
+        stoc.push_back(car);
+        nrStoc++;
+    }
+    static void printCarsStoc(){
+        int i=0;
+        for(auto& car: stoc){
+            ++i;
+            cout<<i << ") Monovolum\n";
+            cout<<*car;
+        }
+    }
+    static void printCarsVandute(){
+        int i=0;
+        for(auto& car: vandute){
+            ++i;
+            cout<<i << ") Monovolum\n";
+            cout<<*car;
+        }
+    }
+    static void printCarsVanduteVara(){
+        int i=0;
+        for(auto& car: vandute){
+            if(car->getVara()) {
+                ++i;
+                cout << i << ") Monovolum\n";
+                cout << *car;
+            }
+        }
+    }
+    Vanzare<Monovolume>& operator-=(shared_ptr<Monovolume>& car){
+        int i;
+        cout<<"Este vara? 1 pentru da, 0 pentru nu: ";
+        cin>>i;
+        nrStoc--;
+        nrVandute++;
+        stoc.erase(remove(stoc.begin(),stoc.end(),car),stoc.end());
+        if(i){
+            nrVanduteVara++;
+            car->setVara(true);
+        }
+        vandute.push_back(car);
+    }
+
+};
+vector<shared_ptr<Monovolume>> Vanzare<Monovolume>::stoc;
+vector<shared_ptr<Monovolume>> Vanzare<Monovolume>::vandute;
+int Vanzare<Monovolume>::nrStoc=0;
+int Vanzare<Monovolume>::nrVandute=0;
+int Vanzare<Monovolume>::nrVanduteVara=0;
+bool Vanzare<Monovolume>::creat=false;
+
+const vector<shared_ptr<Monovolume>> &Vanzare<Monovolume>::getStoc() {
+    return stoc;
+}
+
+template<typename T>
+const vector<shared_ptr<T>> &Vanzare<T>::getStoc() {
+    return stoc;
+}
+
+
+class Menu {
+    static Menu* instance;
+
+    Vanzare<Automobil> automobile;
+    Vanzare<Monovolume> monovolume;
+
+    Menu() = default;
+
+public:
+    static Menu* getInstance();
+
+    Menu(const Menu&) = delete;
+    Menu& operator=(const Menu&) = delete;
+
+    void run();
+};
+
+Menu* Menu::instance = nullptr;
+
+Menu* Menu::getInstance() {
+    if (!instance)
+        instance = new Menu();
+    return instance;
+}
+
+void Menu::run() {
+    int gest;
+    cout << "1. Gestionare Mini/Compact/Monovolum\n";
+    cout << "2. Gestionare Monovolum\n";
+    cin>>gest;
+    if(gest==1) {
+        while (true) {
+            int comanda;
+            cout << "1. Adaugare masina in stoc\n";
+            cout << "2. Vanzare masina din stoc\n";
+            cout << "3. Afisare masini din stoc\n";
+            cout << "4. Afisare masini vandute\n";
+            cout << "5. Afisare numar masini stoc\n";
+            cout << "6. Afisare numar masini vandute\n";
+            cout << "7. Iesire\n\n";
+            cin >> comanda;
+            if (comanda == 1) {
+                int masina;
+                string tip[4] = {"mini", "compact", "monovolum"};
+                cout << "1. Mini\n";
+                cout << "2. Compact\n";
+                cout << "3. Monovolum\n";
+                cin >> masina;
+
                 try {
-                    cin >> abonat;
-                    auto adaug = make_shared<Abonat>(abonat);
-                    Clienti::addAbonat(adaug);
-                    ok=false;
-                    cout << "\nSucces!\n";
+                    if (masina == 1) {
+                        Mini m;
+                        cin >> m;
+
+                        auto car = makeAutomobil(tip[masina - 1], m.getPret(), m.getLitraj(), m.getLung());
+                        automobile.addCar(car);
+                    } else if (masina == 2) {
+                        Compact c;
+                        cin >> c;
+
+                        auto car = makeAutomobil(tip[masina - 1], c.getPret(), c.getDimensiune());
+                        automobile.addCar(car);
+                    } else if (masina == 3) {
+                        Monovolume mon;
+                        cin >> mon;
+
+                        auto car = makeAutomobil(tip[masina - 1], mon.getPret(), mon.getPers(), mon.isSh(),
+                                                 mon.getAni());
+                        automobile.addCar(car);
+                    }
+
                 }
-                catch (const InvalidPret &e) {
-                    cout << e.what()
-                         << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                    cin>>cont;
-                    if(cont==0)
-                        ok= false;
+                catch (const InvalidAutomobil &e) {
+                    cout << e.what() << '\n';
                 }
-                catch (const InvalidPerioada &e) {
-                    cout << e.what()
-                         << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                    cin>>cont;
-                    if(cont==0)
-                        ok= false;
-                }
-                catch (const InvalidReducere &e) {
-                    cout << e.what()
-                         << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                    cin>>cont;
-                    if(cont==0)
-                        ok= false;
-                }
-            }
-            cout<<"Pentru a continua introduceti un caracter si apasati enter:";
-            cin>>c;
+
+            } else if (comanda == 2) {
+                int vand;
+                automobile.printCarsStoc();
+                cout << "Numarul masinii ce se vinde:";
+                cin >> vand;
+                auto masina = automobile.getStoc()[vand - 1];
+                automobile -= masina;
+            } else if (comanda == 3) {
+                automobile.printCarsStoc();
+            } else if (comanda == 4) {
+                automobile.printCarsVandute();
+            } else if (comanda == 5) {
+                cout << automobile.getNrStoc() << '\n';
+            } else if (comanda == 6) {
+                cout << automobile.getNrVandute() << '\n';
+            } else
+                break;
         }
-        else
-            if(meniu==2){
-                int n,cont;
-                Abonat abonat;
-                bool stop=true;
-                cout<<"Adaugati numarul clientilor ce vor fi introdusi:";
-                cin>>n;
-                for(int i=0;i<n && stop;++i){
-                    bool ok=true;
-                    while(ok) {
-                        try {
-                            cin >> abonat;
-                            auto adaug = make_shared<Abonat>(abonat);
-                            Clienti::addAbonat(adaug);
-                            ok=false;
-                            cout << "\nSucces!\n";
-                        }
-                        catch (const InvalidPret &e) {
-                            cout << e.what()
-                                 << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                            cin>>cont;
-                            if(cont==0)
-                                stop=ok= false;
-                        }
-                        catch (const InvalidPerioada &e) {
-                            cout << e.what()
-                                 << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                            cin>>cont;
-                            if(cont==0)
-                                stop=ok= false;
-                        }
-                        catch (const InvalidReducere &e) {
-                            cout << e.what()
-                                 << "\nComanda nu a fost executata...\nPentru a reincerca introduceti 1, iar pentru a abandona introduceti 0:";
-                            cin>>cont;
-                            if(cont==0)
-                                stop=ok= false;
-                        }
-                    }
-                }
-            }
-            else
-                if(meniu==3){
-                    cout<<"Clientii introdusi:\n\n";
-                    Clienti::showAbonati();
-                    cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                    cin>>c;
-                }
-                else
-                    if(meniu==4){
-                        cout<<"Clientii cu abonamente normale introdusi:\n\n";
-                        Clienti::showAbonatiNormali();
-                        cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                        cin>>c;
-                    }
-                    else
-                        if(meniu==5){
-                            cout<<"Clientii cu abonamente premium introdusi:\n\n";
-                            Clienti::showAbonatiPremium();
-                            cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                            cin>>c;
-                        }
-                        else
-                            if(meniu==6){
-                                cout<<"Numarul clientilor cu abonamente normale introdusi: "<<Clienti::getNrAbonatiNormali()<<'\n';
-                                cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                                cin>>c;
-                            }
-                            else
-                                if(meniu==7){
-                                    cout<<"Numarul clientilor cu abonamente premium introdusi: "<<Clienti::getNrAbonatiPremium()<<'\n';
-                                    cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                                    cin>>c;
-                                }
-                                else
-                                    if(meniu==8){
-                                        cout<<"Suma incasata de la clientii introdusi: "<<Clienti::sumaIncasata()<<'\n';
-                                        cout<<"\nPentru a continua introduceti un caracter si apasati enter:";
-                                        cin>>c;
-                                    }
-                                    else
-                                        break;
     }
+    else{
+        while (true) {
+            int comanda;
+            cout << "1. Adaugare masina in stoc\n";
+            cout << "2. Vanzare masina din stoc\n";
+            cout << "3. Afisare masini din stoc\n";
+            cout << "4. Afisare masini vandute\n";
+            cout << "5. Afisare masini vandute vara\n";
+            cout << "6. Afisare numar masini stoc\n";
+            cout << "7. Afisare numar masini vandute\n";
+            cout << "8. Afisare numar masini vandute vara\n";
+            cout << "9. Iesire\n\n";
+            cin >> comanda;
+            if (comanda == 1) {
+                Monovolume mon;
+                cin >> mon;
+
+                auto car = make_shared<Monovolume>(mon);
+
+                monovolume.addCar(car);
+            } else if (comanda == 2) {
+                int vand;
+                monovolume.printCarsStoc();
+                cout << "Numarul masinii ce se vinde:";
+                cin >> vand;
+                auto masina = dynamic_pointer_cast<Monovolume>(monovolume.getStoc()[vand - 1]);
+                monovolume -= masina;
+            } else if (comanda == 3) {
+                monovolume.printCarsStoc();
+            } else if (comanda == 4) {
+                monovolume.printCarsVandute();
+            } else if (comanda == 5) {
+                monovolume.printCarsVanduteVara();
+            } else if (comanda == 6) {
+                cout << monovolume.getNrStoc() << '\n';
+            } else if (comanda == 7) {
+                cout << monovolume.getNrVandute() << '\n';
+            } else if (comanda == 8) {
+                cout << monovolume.getNrVanduteVara() << '\n';
+            } else
+                break;
+        }
+    }
+
+}
+
+int main(){
+    Menu::getInstance()->run();
     return 0;
 }
